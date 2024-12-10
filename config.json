@@ -1,0 +1,5 @@
+{
+    "bigquery_billing_project_id": "terraform-375010",
+    "bigquery_billing_dataset_id": "1_budgets_gsk",
+    "bigquery_billing_view_id": "business_function_map"
+}
