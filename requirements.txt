@@ -1,2 +1,2 @@
-pip install python-hcl2
-pip install google-cloud-bigquery
+python-hcl2<=2 5.1.1
+google-cloud-bigquery<=3.27.0
