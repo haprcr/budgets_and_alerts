@@ -1,0 +1,53 @@
+name: "Scheduled Terraform Deployment"
+
+# Trigger the workflow 
+on:
+  schedule:
+    - cron: "30 7 * * *"  # Adjust this as needed
+  workflow_dispatch:  # Manual trigger support
+
+jobs:
+  run-terraform:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checkout the repository
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    # Set up Python environment
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    # Install dependencies
+    - name: Install Dependencies
+      run: pip install -r requirements.txt
+
+    # Execute the Python script
+    - name: Run Python Script
+      run: python get_tables_list.py
+
+    # Set up Terraform CLI
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.5.0  # Adjust version as needed
+
+    # Initialize Terraform
+    - name: Terraform Init
+      id: terraform_init
+      run: terraform init
+      continue-on-error: false  # If this fails, stop further execution
+
+    # Terraform Plan
+    - name: Terraform Plan
+      id: terraform_plan
+      run: terraform plan -out=tfplan
+      if: ${{ success() && steps.terraform_init.outcome == 'success' }}  # Only run if terraform init was successful
+
+    # Terraform Apply
+    - name: Terraform Apply
+      run: terraform apply -auto-approve tfplan
+      if: ${{ success() && steps.terraform_plan.outcome == 'success' }}  # Only run if terraform plan was successful
